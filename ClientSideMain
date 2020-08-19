@@ -1,0 +1,236 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Event = ReplicatedStorage:WaitForChild("SpawnVehicle")
+
+local CensorOneValue = true
+local CensorTwoValue = true
+local CensorThreeValue = true
+local CensorFourValue = true
+local CensorFiveValue = true
+
+local CensorsFolder = game.Workspace.CarSpawnerWorkspace.Censors
+
+local CensorOne = CensorsFolder.CensorOne
+local CensorTwo = CensorsFolder.CensorTwo
+local CensorThree = CensorsFolder.CensorThree
+local CensorFour = CensorsFolder.CensorFour
+local CensorFive = CensorsFolder.CensorFive
+
+local cframeOne = CensorsFolder.cframeOne
+local cframeTwo = CensorsFolder.cframeTwo
+local cframeThree = CensorsFolder.cframeThree
+local cframeFour = CensorsFolder.cframeFour
+local cframeFive = CensorsFolder.cframeFive
+
+-- DATASTORE VALUES BELOW
+local VehicleOneDSvalue
+local VehicleTwoDSvalue
+local VehicleThreeDSvalue
+local VehicleFourDSvalue
+local CS
+
+local function spawnvehicle(Player, CurrentlySelected, CurrentlySelectedColor, Price)
+	
+	if game.Workspace:FindFirstChild(Player.Name.."'s Car") then
+		game.Workspace[Player.Name.."'s Car"]:Destroy()
+	end
+	
+	CS = CurrentlySelected
+	-- DATASTORE VALUES BELOW
+	 VehicleOneDSvalue = Player:WaitForChild("Vehicle Data").VehicleOne
+	 VehicleTwoDSvalue = Player:WaitForChild("Vehicle Data").VehicleTwo
+	 VehicleThreeDSvalue = Player:WaitForChild("Vehicle Data").VehicleThree
+	 VehicleFourDSvalue = Player:WaitForChild("Vehicle Data").VehicleFour
+	
+	local hum = Player.Character.Humanoid
+	local PlayersMoney = Player.Money
+	PlayersMoney.Value = (PlayersMoney.Value - Price)
+	
+	if CurrentlySelected.Name == "DisplayOne" then
+		local CAR = game.ReplicatedStorage.VehicleFolder.OptionOne:Clone()
+		CAR.Name = (Player.Name.."'s Car") 
+		local ColorParts = CAR.Body.Color:GetChildren()
+		for i = 1, #ColorParts do
+			local C = ColorParts[i]
+			C.Color = (CurrentlySelectedColor)
+		end
+		CAR.Parent = workspace
+		if CensorOneValue == true then
+			CAR:SetPrimaryPartCFrame(cframeOne.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorTwoValue == true then
+			CAR:SetPrimaryPartCFrame(cframeTwo.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorThreeValue == true then
+			CAR:SetPrimaryPartCFrame(cframeThree.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorFourValue == true then
+			CAR:SetPrimaryPartCFrame(cframeFour.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		else -- last resort spawn (will clog up)
+			CAR:SetPrimaryPartCFrame(cframeFive.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		end
+			
+	elseif CurrentlySelected.Name == "DisplayTwo" then
+		local CAR = game.ReplicatedStorage.VehicleFolder.OptionTwo:Clone()
+		CAR.Name = (Player.Name.."'s Car") 
+		local ColorParts = CAR.Body.Color:GetChildren()
+		for i = 1, #ColorParts do
+			local C = ColorParts[i]
+			C.Color = (CurrentlySelectedColor)
+		end
+		CAR.Parent = workspace
+		if CensorOneValue == true then
+			CAR:SetPrimaryPartCFrame(cframeOne.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorTwoValue == true then
+			CAR:SetPrimaryPartCFrame(cframeTwo.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorThreeValue == true then
+			CAR:SetPrimaryPartCFrame(cframeThree.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorFourValue == true then
+			CAR:SetPrimaryPartCFrame(cframeFour.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		else -- last resort spawn (will clog up)
+			CAR:SetPrimaryPartCFrame(cframeFive.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		end
+		
+		elseif CurrentlySelected.Name == "DisplayThree" then
+		local CAR = game.ReplicatedStorage.VehicleFolder.OptionThree:Clone()
+		CAR.Name = (Player.Name.."'s Car") 
+		local ColorParts = CAR.Body.Color:GetChildren()
+		for i = 1, #ColorParts do
+			local C = ColorParts[i]
+			C.Color = (CurrentlySelectedColor)
+		end
+		CAR.Parent = workspace
+		if CensorOneValue == true then
+			CAR:SetPrimaryPartCFrame(cframeOne.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorTwoValue == true then
+			CAR:SetPrimaryPartCFrame(cframeTwo.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorThreeValue == true then
+			CAR:SetPrimaryPartCFrame(cframeThree.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorFourValue == true then
+			CAR:SetPrimaryPartCFrame(cframeFour.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		else -- last resort spawn (will clog up)
+			CAR:SetPrimaryPartCFrame(cframeFive.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		end
+		
+		elseif CurrentlySelected.Name == "DisplayFour" then
+		local CAR = game.ReplicatedStorage.VehicleFolder.OptionFour:Clone()
+		CAR.Name = (Player.Name.."'s Car") 
+		local ColorParts = CAR.Body.Color:GetChildren()
+		for i = 1, #ColorParts do
+			local C = ColorParts[i]
+			C.Color = (CurrentlySelectedColor)
+		end
+		CAR.Parent = workspace
+		if CensorOneValue == true then
+			CAR:SetPrimaryPartCFrame(cframeOne.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorTwoValue == true then
+			CAR:SetPrimaryPartCFrame(cframeTwo.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorThreeValue == true then
+			CAR:SetPrimaryPartCFrame(cframeThree.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		elseif CensorFourValue == true then
+			CAR:SetPrimaryPartCFrame(cframeFour.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		else -- last resort spawn (will clog up)
+			CAR:SetPrimaryPartCFrame(cframeFive.CFrame)
+			wait(1)
+			CAR.DriveSeat:Sit(hum)
+		end
+	end
+	if CS.Name == "DisplayOne" then
+		VehicleOneDSvalue.Value = true
+	elseif CS.Name == "DisplayTwo" then
+		VehicleTwoDSvalue.Value = true
+	elseif CS.Name == "DisplayThree" then
+		VehicleThreeDSvalue.Value = true
+	elseif CS.Name == "DisplayFour" then
+		VehicleFourDSvalue.Value = true
+	else
+		print("ERROR")
+	end
+end
+
+CensorOne.Touched:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorOneValue = false
+	end
+end)
+CensorOne.TouchEnded:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorOneValue = true
+	end
+end)
+CensorTwo.Touched:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorTwoValue = false
+	end
+end)
+CensorTwo.TouchEnded:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorTwoValue = true
+	end
+end)
+CensorThree.Touched:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorThreeValue = false
+	end
+end)
+CensorThree.TouchEnded:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorThreeValue = true
+	end
+end)
+CensorFour.Touched:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorFourValue = false
+	end
+end)
+CensorFour.TouchEnded:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorFourValue = true
+	end
+end)
+CensorFive.Touched:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorFiveValue = false
+	end
+end)
+CensorFive.TouchEnded:Connect(function(toucher) -- began
+	if toucher.Name == "AlertCensor" then
+		CensorFiveValue = true
+	end
+end)
+
+Event.OnServerEvent:Connect(spawnvehicle)
