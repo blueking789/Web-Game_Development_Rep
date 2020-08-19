@@ -1,236 +1,384 @@
+local UserInputService = game:GetService("UserInputService") -- NORMAL VARIABLES CODE BLOCK
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Event = ReplicatedStorage:WaitForChild("SpawnVehicle")
+local RunService = game:GetService("RunService")
+local DetectionPart = game.Workspace.CarSpawnerWorkspace.EntrancePadModel.Detection
+local Player = game.Players.LocalPlayer
+local CameraPart = game.Workspace.CarSpawnerWorkspace.ViewCamera
+local Camera = game.Workspace.Camera
+local CarSpawnerScreen = Player.PlayerGui.CarSpawnerScreen
+local RotationPart = game.Workspace.CarSpawnerWorkspace.RotationPart
 
-local CensorOneValue = true
-local CensorTwoValue = true
-local CensorThreeValue = true
-local CensorFourValue = true
-local CensorFiveValue = true
+local IsTouchingEnter = false
 
-local CensorsFolder = game.Workspace.CarSpawnerWorkspace.Censors
+local DF = game.ReplicatedStorage.DisplayVehicleFolder -- DISPLAY VARIABLES CODE BLOCK
+local DisplayOne = DF.DisplayOne
+local DisplayTwo = DF.DisplayTwo
+local DisplayThree = DF.DisplayThree
+local DisplayFour = DF.DisplayFour
 
-local CensorOne = CensorsFolder.CensorOne
-local CensorTwo = CensorsFolder.CensorTwo
-local CensorThree = CensorsFolder.CensorThree
-local CensorFour = CensorsFolder.CensorFour
-local CensorFive = CensorsFolder.CensorFive
+local CurrentlySelected = DisplayOne -- selected by default
 
-local cframeOne = CensorsFolder.cframeOne
-local cframeTwo = CensorsFolder.cframeTwo
-local cframeThree = CensorsFolder.cframeThree
-local cframeFour = CensorsFolder.cframeFour
-local cframeFive = CensorsFolder.cframeFive
+local InfoFolder = Player.PlayerGui.CarSpawnerScreen.VehicleInformation
+local ScrollFrame = Player.PlayerGui.CarSpawnerScreen.Background.CarSelection -- GUI variables
+
+local OptionOneFrame = ScrollFrame.OptionOne
+local OptionTwoFrame = ScrollFrame.OptionTwo
+local OptionThreeFrame = ScrollFrame.OptionThree
+local OptionFourFrame = ScrollFrame.OptionFour
+
+local OptionOneCheck = ScrollFrame.OptionOne.Outline.Frame.Check
+local OptionTwoCheck = ScrollFrame.OptionTwo.Outline.Frame.Check
+local OptionThreeCheck = ScrollFrame.OptionThree.Outline.Frame.Check
+local OptionFourCheck = ScrollFrame.OptionFour.Outline.Frame.Check
+
+local CHECKS = {OptionOneCheck, OptionTwoCheck, OptionThreeCheck, OptionFourCheck}
+
+local ColorValue = Player.PlayerGui.CarSpawnerScreen.CurrentColor
+
+local CurrentlySelectedColor = ColorValue.Value -- CURRENT color value as pass arguement
+local ALL = Player.PlayerGui.CarSpawnerScreen.ColorBackground.ColorBackground:GetChildren()
+local CheckOne = Player.PlayerGui.CarSpawnerScreen.Background.ColorFrame.RandomColor.Outline.Frame.Check
+local CheckTwo = Player.PlayerGui.CarSpawnerScreen.Background.ColorFrame.CustomColor.Outline.Frame.Check
+local ColorOptionOneButton = CheckOne.Parent.Parent.PickColor
+local ColorOptionTwoButton = CheckTwo.Parent.Parent.PickColor
+local ColorPadFrame = Player.PlayerGui.CarSpawnerScreen.ColorBackground -- normal: {0.536, 0},{0.878, 0}
+
+local BACKGROUND = CarSpawnerScreen.Background
+local CloseButton = Player.PlayerGui.CarSpawnerScreen.CloseButton
+
+local SpawnVehicleEvent = ReplicatedStorage:WaitForChild("SpawnVehicle")
+local PurchaseButton = Player.PlayerGui.CarSpawnerScreen.Background.Purchase
+local Price = 10500
+local SpawnButton = Player.PlayerGui.CarSpawnerScreen.Background.Spawn
 
 -- DATASTORE VALUES BELOW
-local VehicleOneDSvalue
-local VehicleTwoDSvalue
-local VehicleThreeDSvalue
-local VehicleFourDSvalue
-local CS
+local VehicleOneDSvalue = Player:WaitForChild("Vehicle Data").VehicleOne
+local VehicleTwoDSvalue = Player:WaitForChild("Vehicle Data").VehicleTwo
+local VehicleThreeDSvalue = Player:WaitForChild("Vehicle Data").VehicleThree
+local VehicleFourDSvalue = Player:WaitForChild("Vehicle Data").VehicleFour
 
-local function spawnvehicle(Player, CurrentlySelected, CurrentlySelectedColor, Price)
-	
-	if game.Workspace:FindFirstChild(Player.Name.."'s Car") then
-		game.Workspace[Player.Name.."'s Car"]:Destroy()
-	end
-	
-	CS = CurrentlySelected
-	-- DATASTORE VALUES BELOW
-	 VehicleOneDSvalue = Player:WaitForChild("Vehicle Data").VehicleOne
-	 VehicleTwoDSvalue = Player:WaitForChild("Vehicle Data").VehicleTwo
-	 VehicleThreeDSvalue = Player:WaitForChild("Vehicle Data").VehicleThree
-	 VehicleFourDSvalue = Player:WaitForChild("Vehicle Data").VehicleFour
-	
-	local hum = Player.Character.Humanoid
-	local PlayersMoney = Player.Money
-	PlayersMoney.Value = (PlayersMoney.Value - Price)
-	
-	if CurrentlySelected.Name == "DisplayOne" then
-		local CAR = game.ReplicatedStorage.VehicleFolder.OptionOne:Clone()
-		CAR.Name = (Player.Name.."'s Car") 
-		local ColorParts = CAR.Body.Color:GetChildren()
-		for i = 1, #ColorParts do
-			local C = ColorParts[i]
-			C.Color = (CurrentlySelectedColor)
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+local function CLEAR() -- Clears all selected color pallet boxes
+	for i = 1, #ALL do
+		local C = ALL [i]
+		if string.find(C.Name, "Color") then
+			C.BorderColor3 = Color3.fromRGB(188,188,188)
 		end
-		CAR.Parent = workspace
-		if CensorOneValue == true then
-			CAR:SetPrimaryPartCFrame(cframeOne.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorTwoValue == true then
-			CAR:SetPrimaryPartCFrame(cframeTwo.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorThreeValue == true then
-			CAR:SetPrimaryPartCFrame(cframeThree.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorFourValue == true then
-			CAR:SetPrimaryPartCFrame(cframeFour.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		else -- last resort spawn (will clog up)
-			CAR:SetPrimaryPartCFrame(cframeFive.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		end
-			
-	elseif CurrentlySelected.Name == "DisplayTwo" then
-		local CAR = game.ReplicatedStorage.VehicleFolder.OptionTwo:Clone()
-		CAR.Name = (Player.Name.."'s Car") 
-		local ColorParts = CAR.Body.Color:GetChildren()
-		for i = 1, #ColorParts do
-			local C = ColorParts[i]
-			C.Color = (CurrentlySelectedColor)
-		end
-		CAR.Parent = workspace
-		if CensorOneValue == true then
-			CAR:SetPrimaryPartCFrame(cframeOne.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorTwoValue == true then
-			CAR:SetPrimaryPartCFrame(cframeTwo.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorThreeValue == true then
-			CAR:SetPrimaryPartCFrame(cframeThree.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorFourValue == true then
-			CAR:SetPrimaryPartCFrame(cframeFour.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		else -- last resort spawn (will clog up)
-			CAR:SetPrimaryPartCFrame(cframeFive.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		end
-		
-		elseif CurrentlySelected.Name == "DisplayThree" then
-		local CAR = game.ReplicatedStorage.VehicleFolder.OptionThree:Clone()
-		CAR.Name = (Player.Name.."'s Car") 
-		local ColorParts = CAR.Body.Color:GetChildren()
-		for i = 1, #ColorParts do
-			local C = ColorParts[i]
-			C.Color = (CurrentlySelectedColor)
-		end
-		CAR.Parent = workspace
-		if CensorOneValue == true then
-			CAR:SetPrimaryPartCFrame(cframeOne.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorTwoValue == true then
-			CAR:SetPrimaryPartCFrame(cframeTwo.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorThreeValue == true then
-			CAR:SetPrimaryPartCFrame(cframeThree.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorFourValue == true then
-			CAR:SetPrimaryPartCFrame(cframeFour.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		else -- last resort spawn (will clog up)
-			CAR:SetPrimaryPartCFrame(cframeFive.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		end
-		
-		elseif CurrentlySelected.Name == "DisplayFour" then
-		local CAR = game.ReplicatedStorage.VehicleFolder.OptionFour:Clone()
-		CAR.Name = (Player.Name.."'s Car") 
-		local ColorParts = CAR.Body.Color:GetChildren()
-		for i = 1, #ColorParts do
-			local C = ColorParts[i]
-			C.Color = (CurrentlySelectedColor)
-		end
-		CAR.Parent = workspace
-		if CensorOneValue == true then
-			CAR:SetPrimaryPartCFrame(cframeOne.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorTwoValue == true then
-			CAR:SetPrimaryPartCFrame(cframeTwo.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorThreeValue == true then
-			CAR:SetPrimaryPartCFrame(cframeThree.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		elseif CensorFourValue == true then
-			CAR:SetPrimaryPartCFrame(cframeFour.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		else -- last resort spawn (will clog up)
-			CAR:SetPrimaryPartCFrame(cframeFive.CFrame)
-			wait(1)
-			CAR.DriveSeat:Sit(hum)
-		end
-	end
-	if CS.Name == "DisplayOne" then
-		VehicleOneDSvalue.Value = true
-	elseif CS.Name == "DisplayTwo" then
-		VehicleTwoDSvalue.Value = true
-	elseif CS.Name == "DisplayThree" then
-		VehicleThreeDSvalue.Value = true
-	elseif CS.Name == "DisplayFour" then
-		VehicleFourDSvalue.Value = true
-	else
-		print("ERROR")
 	end
 end
 
-CensorOne.Touched:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorOneValue = false
-	end
+ColorOptionOneButton.MouseButton1Click:Connect(function() -- RANDOM COLOR FUNCTION
+	CheckTwo.Visible = false
+	CheckOne.Visible = true
+	CLEAR()
+	ColorPadFrame:TweenPosition(
+		UDim2.new(0.541, 0,1.5,0),
+		"Out", -- easing direction
+		"Linear", --easing style
+		.5, -- time in seconds
+		false -- override any other tweens, if true, stops all other tweens
+		)
+	Player.PlayerGui.CarSpawnerScreen.ColorBackground.ColorBackground.ColorOne.BorderColor3 = Color3.fromRGB(176, 164, 0)
+	
+	CurrentlySelectedColor = Color3.fromRGB(math.random(0,200),math.random(0,200),math.random(0,200))
 end)
-CensorOne.TouchEnded:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorOneValue = true
-	end
+
+local function TweenClosing()
+	-- close button original pos = {0.895, 0},{0.876, 0}
+	-- Background frame original pos = {0.149, 0},{0.475, 0}
+	-- Color frame original pos = {0.536, 0},{1.5, 0}
+	ColorPadFrame:TweenPosition(
+		UDim2.new(0.541, 0,1.5,0),
+		"Out", -- easing direction
+		"Linear", --easing style
+		1.5, -- time in seconds
+		false -- override any other tweens, if true, stops all other tweens
+	)
+	BACKGROUND:TweenPosition(
+		UDim2.new(-0.5, 0, 0.475, 0),
+		"Out", -- easing direction
+		"Linear", --easing style
+		1.5, -- time in seconds
+		false -- override any other tweens, if true, stops all other tweens
+	)
+	CloseButton:TweenPosition(
+		UDim2.new(0.895, 0, 1.5, 0),
+		"Out", -- easing direction
+		"Linear", --easing style
+		1.5, -- time in seconds
+		false -- override any other tweens, if true, stops all other tweens
+		)
+end
+
+ColorOptionTwoButton.MouseButton1Click:Connect(function() -- CUSTOM COLOR FUNCTION
+	CheckOne.Visible = false
+	CheckTwo.Visible = true
+	
+	ColorPadFrame:TweenPosition(
+		UDim2.new(0.536, 0,0.860, 0),
+		"Out", -- easing direction
+		"Linear", --easing style
+		.5, -- time in seconds
+		false -- override any other tweens, if true, stops all other tweens
+		)
 end)
-CensorTwo.Touched:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorTwoValue = false
+
+local function ClearChecks() -- makes all checks non visible
+	for i = 1, #CHECKS do
+		local child = CHECKS [i]
+		child.Visible = false
 	end
-end)
-CensorTwo.TouchEnded:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorTwoValue = true
+end
+
+local function DestroyDisplay() -- Destroys any current dispaly in workspace
+	if game.Workspace.DisplayInWorkspace then
+		game.Workspace.DisplayInWorkspace:Destroy()
 	end
-end)
-CensorThree.Touched:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorThreeValue = false
+end
+
+local function SpawnDisplay() -- spawns display that is selected
+	DestroyDisplay() -- will delete any displays in workspace
+	local C = CurrentlySelected:Clone()
+	C.Name = "DisplayInWorkspace"
+	C.Parent = workspace
+end
+
+local BLUR = game.Lighting.Blur
+
+local function PurchaseVehicle()
+	local PlayersMoney = Player.Money.Value
+	if PlayersMoney >= Price then
+		TweenClosing()
+		wait(.5)
+		BLUR.Enabled = true
+		CarSpawnerScreen.SpawningVehicleText.Visible = true
+		wait(2)
+		SpawnVehicleEvent:FireServer(CurrentlySelected, CurrentlySelectedColor, Price)
+		wait(1)
+		BLUR.Enabled = false
+		CarSpawnerScreen.SpawningVehicleText.Visible = false
+	else
+		print("CANT AFFORD")
+		PurchaseButton.Rounder.ImageColor3 = Color3.fromRGB(189, 85, 85)
+		PurchaseButton.Rounder.TextLabel.Text = "Cant Afford Selected"
+		wait(1)
+		PurchaseButton.Rounder.ImageColor3 = Color3.fromRGB(116, 189, 127)
+		PurchaseButton.Rounder.TextLabel.Text = "Purchase Vehicle"
+		-- change purchase button red, and text to Cant afford
 	end
-end)
-CensorThree.TouchEnded:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorThreeValue = true
-	end
-end)
-CensorFour.Touched:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorFourValue = false
-	end
-end)
-CensorFour.TouchEnded:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorFourValue = true
-	end
-end)
-CensorFive.Touched:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorFiveValue = false
-	end
-end)
-CensorFive.TouchEnded:Connect(function(toucher) -- began
-	if toucher.Name == "AlertCensor" then
-		CensorFiveValue = true
+end
+
+local function SpawnAlreadyPurchasedVehicle()
+	Price = 0
+	local PlayersMoney = Player.Money.Value
+		TweenClosing()
+		wait(.5)
+		BLUR.Enabled = true
+		CarSpawnerScreen.SpawningVehicleText.Visible = true
+		wait(2)
+		SpawnVehicleEvent:FireServer(CurrentlySelected, CurrentlySelectedColor, Price)
+		wait(1)
+		BLUR.Enabled = false
+		CarSpawnerScreen.SpawningVehicleText.Visible = false
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed) -- PRESS E ect.. CODE BLOCK
+	if input.UserInputType == Enum.UserInputType.Keyboard then
+		local KeyPressed = input.KeyCode.Name
+		if KeyPressed == "E" then
+			if IsTouchingEnter == true then
+				Camera.CameraType = Enum.CameraType.Scriptable
+				Camera.CFrame = CameraPart.CFrame
+				-- close button original pos = {0.895, 0},{0.876, 0}
+				-- Background frame original pos = {0.149, 0},{0.475, 0}
+				BACKGROUND:TweenPosition(
+					UDim2.new(0.149, 0, 0.475, 0),
+					"Out", -- easing direction
+					"Linear", --easing style
+					1.5, -- time in seconds
+					false -- override any other tweens, if true, stops all other tweens
+				)
+				CloseButton:TweenPosition(
+					UDim2.new(0.895, 0, 0.876, 0),
+					"Out", -- easing direction
+					"Linear", --easing style
+					1.5, -- time in seconds
+					false -- override any other tweens, if true, stops all other tweens
+					)
+				CarSpawnerScreen.Enabled = true
+			end
+		end
 	end
 end)
 
-Event.OnServerEvent:Connect(spawnvehicle)
+DetectionPart.Touched:Connect(function(part) -- TOUCH
+	if part.Parent:FindFirstChild("Humanoid") == nil then return end
+	if game.Players:GetPlayerFromCharacter(part.Parent) == nil then return end
+	if part.Parent.Name == Player.Name then
+		IsTouchingEnter = true
+	end
+end)
+
+DetectionPart.TouchEnded:Connect(function(part) -- TOUCH ENDED
+	if part.Parent:FindFirstChild("Humanoid") == nil then return end
+	if game.Players:GetPlayerFromCharacter(part.Parent) == nil then return end
+	if part.Parent.Name == Player.Name then
+		IsTouchingEnter = false
+	end
+end)
+
+local rotation = 0
+local Vehicle
+
+RunService.RenderStepped:Connect(function(step) -- CFrame for any vehicle display in workspace
+	if game.Workspace.DisplayInWorkspace then
+		Vehicle = game.Workspace:WaitForChild("DisplayInWorkspace")
+		rotation = rotation + .01
+		Vehicle:SetPrimaryPartCFrame(RotationPart.CFrame * CFrame.Angles(0, rotation, 0))
+	end
+end)
+
+local function fill() -- fills information into the GUI
+	OptionOneFrame.NameOfCar.Text = (InfoFolder.OptionOneInfo.NameOfCar.Value)
+	OptionOneFrame.Make.Text = ("Make: ".. InfoFolder.OptionOneInfo.Make.Value)
+	OptionOneFrame.Year.Text = ("Year: ".. InfoFolder.OptionOneInfo.Year.Value)
+	OptionOneFrame.Price.Text = ("Price: $".. InfoFolder.OptionOneInfo.Price.Value)
+	
+	OptionTwoFrame.NameOfCar.Text = (InfoFolder.OptionTwoInfo.NameOfCar.Value)
+	OptionTwoFrame.Make.Text = ("Make: ".. InfoFolder.OptionTwoInfo.Make.Value)
+	OptionTwoFrame.Year.Text = ("Year: ".. InfoFolder.OptionTwoInfo.Year.Value)
+	OptionTwoFrame.Price.Text = ("Price: $".. InfoFolder.OptionTwoInfo.Price.Value)
+	
+	OptionThreeFrame.NameOfCar.Text = (InfoFolder.OptionThreeInfo.NameOfCar.Value)
+	OptionThreeFrame.Make.Text = ("Make: ".. InfoFolder.OptionThreeInfo.Make.Value)
+	OptionThreeFrame.Year.Text = ("Year: ".. InfoFolder.OptionThreeInfo.Year.Value)
+	OptionThreeFrame.Price.Text = ("Price: $".. InfoFolder.OptionThreeInfo.Price.Value)
+	
+	OptionFourFrame.NameOfCar.Text = (InfoFolder.OptionFourInfo.NameOfCar.Value)
+	OptionFourFrame.Make.Text = ("Make: ".. InfoFolder.OptionFourInfo.Make.Value)
+	OptionFourFrame.Year.Text = ("Year: ".. InfoFolder.OptionFourInfo.Year.Value)
+	OptionFourFrame.Price.Text = ("Price: $".. InfoFolder.OptionFourInfo.Price.Value)
+end
+fill()
+
+OptionOneCheck.Parent.Parent.OptionOneButton.MouseButton1Click:Connect(function()
+	ClearChecks()
+	CurrentlySelected = DisplayOne
+	OptionOneCheck.Visible = true
+	Price = InfoFolder.OptionOneInfo.Price.Value
+	SpawnDisplay()
+	if VehicleOneDSvalue.Value == true then
+		PurchaseButton.Visible = false
+		SpawnButton.Visible = true
+	else
+		PurchaseButton.Visible = true
+		SpawnButton.Visible = false
+	end
+end)
+
+OptionTwoCheck.Parent.Parent.OptionTwoButton.MouseButton1Click:Connect(function()
+	ClearChecks()
+	CurrentlySelected = DisplayTwo
+	OptionTwoCheck.Visible = true
+	Price = InfoFolder.OptionTwoInfo.Price.Value
+	SpawnDisplay()
+	if VehicleTwoDSvalue.Value == true then
+		PurchaseButton.Visible = false
+		SpawnButton.Visible = true
+	else
+		PurchaseButton.Visible = true
+		SpawnButton.Visible = false
+	end
+end)
+
+OptionThreeCheck.Parent.Parent.OptionThreeButton.MouseButton1Click:Connect(function()
+	ClearChecks()
+	CurrentlySelected = DisplayThree
+	OptionThreeCheck.Visible = true
+	Price = InfoFolder.OptionThreeInfo.Price.Value
+	SpawnDisplay()
+	if VehicleThreeDSvalue.Value == true then
+		PurchaseButton.Visible = false
+		SpawnButton.Visible = true
+	else
+		PurchaseButton.Visible = true
+		SpawnButton.Visible = false
+	end
+end)
+
+OptionFourCheck.Parent.Parent.OptionFourButton.MouseButton1Click:Connect(function()
+	ClearChecks()
+	CurrentlySelected = DisplayFour
+	OptionFourCheck.Visible = true
+	Price = InfoFolder.OptionFourInfo.Price.Value
+	SpawnDisplay()
+	if VehicleFourDSvalue.Value == true then
+		PurchaseButton.Visible = false
+		SpawnButton.Visible = true
+	else
+		PurchaseButton.Visible = true
+		SpawnButton.Visible = false
+	end
+end)
+
+local Cars = game.ReplicatedStorage.DisplayVehicleFolder:GetChildren()
+
+ColorValue.Changed:Connect(function() -- if the color value is changed
+	CurrentlySelectedColor = ColorValue.Value
+	print(CurrentlySelectedColor)
+	if game.Workspace.DisplayInWorkspace then
+		local ColorParts = game.Workspace.DisplayInWorkspace.Body.Color
+		for i = 1, #ColorParts:GetChildren() do
+			local current = ColorParts:GetChildren()[i]
+			current.Color = ColorValue.Value
+		end
+		
+		for i = 1, #Cars do
+			local current = Cars [i]
+			local ColorParts = current.Body.Color:GetChildren()
+			for i = 1, #ColorParts do
+				local child = ColorParts [i]
+				child.Color = ColorValue.Value
+			end
+		end
+	end
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+	ColorPadFrame:TweenPosition(
+		UDim2.new(0.541, 0,1.5,0),
+		"Out", -- easing direction
+		"Linear", --easing style
+		1.5, -- time in seconds
+		false -- override any other tweens, if true, stops all other tweens
+	)
+	BACKGROUND:TweenPosition(
+		UDim2.new(-0.5, 0, 0.475, 0),
+		"Out", -- easing direction
+		"Linear", --easing style
+		1.5, -- time in seconds
+		false -- override any other tweens, if true, stops all other tweens
+	)
+	CloseButton:TweenPosition(
+		UDim2.new(0.895, 0, 1.5, 0),
+		"Out", -- easing direction
+		"Linear", --easing style
+		1.5, -- time in seconds
+		false -- override any other tweens, if true, stops all other tweens
+	)
+	BLUR.Enabled = true
+	CarSpawnerScreen.LeavingDealershipText.Visible = true
+	wait(2)
+	CarSpawnerScreen.LeavingDealershipText.Visible = false
+	BLUR.Enabled = false
+	CarSpawnerScreen.Enabled = false
+	Camera.CameraType = Enum.CameraType.Custom
+	wait(3)
+	CheckOne.Visible = true
+	CheckTwo.Visible = false
+end)
+
+PurchaseButton.MouseButton1Click:Connect(PurchaseVehicle)
+SpawnButton.MouseButton1Click:Connect(SpawnAlreadyPurchasedVehicle)
