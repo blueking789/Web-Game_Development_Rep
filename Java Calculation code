@@ -1,0 +1,34 @@
+public class Calculate{
+    public static void main(String[] args) {
+        System.out.println("[Calc]Running...");
+        
+        int firstCalcVar = 5; // first number for calculation
+        int secondCalcVar = 57; // second number for calculation
+        String methodType = "multNum"; // methods: "addNum", "subNum", "multNum", "divNum"
+        
+        System.out.println("[Calc]Loading...");
+        
+        try {
+            Thread.sleep(1000); // 1000 mili = 1 second
+        } catch(InterruptedException ex) {
+             Thread.currentThread().interrupt();
+        }
+        System.out.println("[Calc]Calculating...");
+        
+        if (methodType == "addNum") {
+            int calculatedAns = firstCalcVar + secondCalcVar;
+            System.out.println("[Calc]Answer: "+calculatedAns);
+        } else if (methodType == "subNum") {
+            int calculatedAns = firstCalcVar - secondCalcVar;
+            System.out.println("[Calc]Answer: "+calculatedAns);
+        } else if (methodType == "multNum") {
+            int calculatedAns = firstCalcVar * secondCalcVar;
+            System.out.println("[Calc]Answer: "+calculatedAns);
+        } else if (methodType == "divNum") {
+            int calculatedAns = firstCalcVar / secondCalcVar;
+            System.out.println("[Calc]Answer: "+calculatedAns);
+        } else {
+            System.out.println("[Calc]Calculate.java:7: error: invalid method type; String methodType");
+        }
+    }
+}
