@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Page Heading</h1>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum vero laborum ab dolore amet! Quaerat voluptatum quibusdam, aliquid voluptas placeat corporis a, asperiores culpa, ipsam vero praesentium pariatur               accusantium dolore? Lorem ipsum dolor, <strong>sit amet consectetur adipisicing elit.</strong> Obcaecati et ut sequi vel quisquam. Tenetur aliquam quisquam accusantium eos omnis quo odio exercitationem aut                 necessitatibus aperiam, dicta quam voluptates       veniam! Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil itaque <em>magni saepe, voluptates iste consequuntur</em> laudantium debitis neque atque           eos possimus laborum est ipsa minima adipisci repellendus dolore. Magnam, nemo. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, mollitia culpa quisquam voluptates voluptatem quam quidem quae at             sunt explicabo ipsum sequi praesentium sit illo itaque deleniti! Sunt, soluta quas.
+    </p>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum vero laborum ab dolore amet! Quaerat voluptatum quibusdam, aliquid voluptas placeat corporis a, asperiores culpa, ipsam vero praesentium pariatur               accusantium dolore? Lorem ipsum dolor, <strong>sit amet consectetur adipisicing elit.</strong> Obcaecati et ut sequi vel quisquam. Tenetur aliquam quisquam accusantium eos omnis quo odio exercitationem aut                 necessitatibus aperiam, dicta quam voluptates veniam! Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil itaque <em>magni saepe, voluptates iste consequuntur</em> laudantium debitis neque atque eos             possimus laborum est ipsa minima adipisci repellendus dolore. Magnam, nemo. Lorem ipsum dolor sit amet <a href="http://google.com"target="_blank">consectetur</a> adipisicing elit. Quasi, mollitia culpa quisquam voluptates voluptatem quam quidem quae at sunt           explicabo ipsum sequi praesentium sit illo itaque deleniti! Sunt, soluta quas.
+    </p>
+    <br>
+    <hr>
+    <br>
+    <ul>
+      <li>Listed Item 1</li>
+       <li>Listed Item 2</li>
+       <li>Listed Item 3</li>
+       <li>Listed Item 4</li>
+       <li>Listed Item 5</li>
+       <li>Listed Item 6</li>
+    </ul>
+    <br>
+    <hr>
+    <br>
+     <ol>
+      <li>Listed Item 1</li>
+       <li>Listed Item 2</li>
+       <li>Listed Item 3</li>
+       <li>Listed Item 4</li>
+       <li>Listed Item 5</li>
+       <li>Listed Item 6</li>
+    </ol>
+    <br>
+    <hr>
+    <br>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Caleb H</td>
+          <td>FakeEmailAcount@gmail.com</td>
+          <td>17 Years old</td>
+        </tr>
+         <tr>
+          <td>Caleb H</td>
+          <td>FakeEmailAcount@gmail.com</td>
+          <td>17 Years old</td>
+        </tr>
+         <tr>
+          <td>Caleb H</td>
+          <td>FakeEmailAcount@gmail.com</td>
+          <td>17 Years old</td>
+        </tr>
+      </tbody>
+    </table>
+    <br> <!--this adds a space-->
+    <hr> <!--this adds a line-->
+    <br>
+    <form action="process.php" method="POST">
+      <div>
+      <label>First Name</label>
+      <input type="text" name="firstName">
+      </div>
+      <br>
+      <div>
+       <label>Last Name</label>
+       <input type="text" name="lastName">
+      </div>
+       <br>
+      <div>
+       <label>Email</label>
+       <input type="email" name="email">
+      </div>
+       <br>
+      <div>
+       <label>Message</label>
+        <textarea name="Message"></textarea>
+      </div>
+      <br>
+      <div>
+        <label>gender</label>
+        <select name="Gender">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+       <br>
+      <div>
+        <label>Age:</label>
+        <input type="number" name="Age" value="0">
+      </div>
+      <br>
+      <div>
+        <label>Birthday:</label>
+        <input type="date" name="Birthday">
+      </div>
+      <br>
+      <input type="submit" name="submit" value="Submit">
+    </form>
+    <br>
+    <hr>
+    <br>
+    <button>Click Me</button>
+    <br>
+    <hr>
+    <br>
+    <img src="Coding.jpg"> <!--this will only work if the image is in the same file place-->
+    <br>
+    <hr>
+    <br>
+    <blockquote cite="http://traversymedia.com">
+      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Labore est aut nemo saepe eveniet, vero nostrum alias earum quo aspernatur sunt repudiandae molestiae sed asperiores tenetur animi? Labore, beatae quod?
+    </blockquote>
+    <br
+    <p>The <abbr title="world wide web">WWW</abbr> is awesome</p>
+    <br>
+  <p><cite>HTML crash course</cite> by brad traversy</p>
+  </body>
+</html>
