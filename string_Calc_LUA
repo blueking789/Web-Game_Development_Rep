@@ -1,0 +1,68 @@
+local Input = "twenty minus ten"
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+Str_Lst_Spc = 0
+local function Seperate_Str(Fixed_Input, Type)
+	if Type == 1 then
+		for i = 1, #Fixed_Input do
+      local Index_Str = string.sub(Fixed_Input, i, i)
+			if Index_Str == " " then
+				local Input_1 = string.sub(Fixed_Input, 1, i - 1)
+        Str_Lst_Spc = i
+        return Input_1
+			end
+		end
+  elseif Type == 2 then
+    for i = 1, #Fixed_Input do
+      if i > Str_Lst_Spc then
+        local Index_Str = string.sub(Fixed_Input, i, i)
+        if Index_Str == " " then
+          local Input_2 = string.sub(Fixed_Input, Str_Lst_Spc + 1, i - 1)
+          Str_Lst_Spc = i
+          return Input_2
+        end
+      end
+    end
+  elseif Type == 3 then
+    local Input_3 = string.sub(Fixed_Input, Str_Lst_Spc + 1, #Fixed_Input)
+    Str_Lst_Spc = 0
+    return Input_3
+	end
+end
+local Num_Chars = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty one", "twenty two", "twenty three", "twenty four", "twenty five", "twenty six", "twenty seven", "twenty eight", "twenty nine", "thirty", "thirty one", "thirty two", "thirty three", "thirty four", "thirty five", "thirty six", "thirty seven", "thirty eight", "thirty nine", "fourty", "fourty one", "fourty two", "fourty three", "fourty four", "fourty five", "fourty six", "fourty seven", "fourty eight", "fourty nine", "fifty", "fifty one", "fifty two", "fifty three", "fifty four", "fifty five", "fifty six", "fifty seven", "fifty eight", "fifty nine", "sixty", "sixty one", "sixty two", "sixty three", "sixty four", "sixty five", "sixty six", "sixty seven", "sixty eight", "sixty nine", "seventy", "seventy one", "seventy two", "seventy three", "seventy four", "seventy five", "seventy six", "seventy seven", "seventy eight", "seventy nine", "eighty", "eighty one", "eighty two", "eighty three", "eighty four", "eighty five", "eighty six", "eighty seven", "eighty eight", "eighty nine", "ninty", "ninty one", "ninty two", "ninty three", "ninty four", "ninty five", "ninty six", "ninty seven", "ninty eight", "ninty nine", "one hundred"}
+local function Fig_Num(Rec_Input)
+  for i = 1, #Num_Chars do
+    if Rec_Input == Num_Chars[i] then
+      return i
+    end
+  end
+end
+local function Fig_Ans(Rec_Input, I_1, I_3)
+  if Rec_Input == "plus" or Rec_Input == "add" then
+    local Ans = I_1 + I_3
+    return Ans
+  elseif Rec_Input == "minus" or Rec_Input == "subtract" then
+    local Ans = I_1 - I_3
+    return Ans
+  elseif Rec_Input == "times" or Rec_Input == "multiply" then
+    local Ans = I_1 * I_3
+    return Ans
+  elseif Rec_Input == "divide" then
+    local Ans = I_1 / I_3
+    return Ans
+  end
+end
+local function Return_Ans(Ans)
+  print(string.lower(Input).. " is equal to "..Num_Chars[Ans])
+end
+local function Convert_StartUp()
+	local Input_Fixed = string.lower(Input)
+	local Input_1 = Seperate_Str(Input_Fixed, 1)
+  local Input_2 = Seperate_Str(Input_Fixed, 2)
+  local Input_3 = Seperate_Str(Input_Fixed, 3)
+  local Fixed_Input_1 = Fig_Num(Input_1)
+  local Fixed_Input_3 = Fig_Num(Input_3)
+  local Fixed_Ans = Fig_Ans(Input_2, Fixed_Input_1, Fixed_Input_3)
+  Return_Ans(Fixed_Ans)
+end
+Convert_StartUp()
