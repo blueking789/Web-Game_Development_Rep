@@ -1,0 +1,272 @@
+-- // Mini Game Project // Scripted by: Blue_king789
+
+local Run_Service = game:GetService("RunService")
+local User_Input_Service = game:GetService("UserInputService")
+-- // Services
+
+local Game_Background_Frame = script.Parent.Background_Frame:WaitForChild("Game_Background_Frame")
+local Game_Frame = Game_Background_Frame:WaitForChild("Game_Frame")
+local Player_Shuttle = Game_Frame:WaitForChild("Player_Shuttle")
+local Enemy_Shuttle = Game_Frame:WaitForChild("Enemy_Shuttle")
+local Game_Title_Text = Game_Background_Frame:WaitForChild("Game_Title_Text")
+local Start_Text = Game_Background_Frame:WaitForChild("Start_Text")
+local Score_Text = Game_Background_Frame:WaitForChild("Score_Text")
+local Best_Score_Text = Game_Background_Frame:WaitForChild("Best_Score_Text")
+local Game_Over_Text = Game_Background_Frame:WaitForChild("Game_Over_Text")
+local Bullet = Game_Frame:WaitForChild("Bullet")
+local Lives_Text = Game_Background_Frame:WaitForChild("Lives_Text")
+-- // UI
+
+local Input_Cooldown_Wait = 1
+local RightMax = .99
+local LeftMax = .01
+local Move_Increment = .01
+local Movement_Wait_Increment = 0
+local Starting_X = .5
+local Starting_Y = .97
+local Bullet_Starting_Y = .9
+local Fire_Cooldown_Time = .1
+local Bullet_Move_Increment = .02
+local Bullet_Move_Wait_Time = .5
+local Enemy_Move_Wait_Time = 1
+local Enemy_Move_Increment = .005
+local Enemy_Y_Starting = -0.05
+local Starting_Lives = 5
+-- // Game Settings
+
+local Game_InProgress = false
+local Input_Cooldown = false
+local Moving_Left = false
+local Moving_Right = false
+local Movement_Wait = 0
+local Current_X = Starting_X
+local Fire_Cooldown = false
+local Bullet_Move_Wait = 0
+local Enemy_Move_Wait = 0
+local Score = 0
+local Best_Score = 0
+local Enemy_Spawn_Increment = 0
+local Lives = Starting_Lives
+-- // Functionality Vars
+
+local function Start_Game()
+	Game_Over_Text.Visible = false
+	Start_Text.Visible = false
+	Lives_Text.Visible = true
+	
+	Player_Shuttle.Position = UDim2.new(Starting_X, 0, Starting_Y, 0)
+	Player_Shuttle.Visible = true
+	
+	Game_InProgress = true
+end
+-- // Setup Game
+
+local function Fire()
+	local New_Bullet = Bullet:Clone()
+	New_Bullet.Parent = Game_Frame
+	New_Bullet.Position = UDim2.new(Current_X, 0, Bullet_Starting_Y, 0)
+	New_Bullet.Visible = true
+	New_Bullet.Y_Value.Value = Bullet_Starting_Y
+	New_Bullet.X_Value.Value = Current_X
+	New_Bullet.Name = "Active_Bullet"
+end
+-- // Spawn Bullet
+
+local function Game_Over()
+	Game_Over_Text.Visible = true
+	Input_Cooldown = true
+	Game_InProgress = false
+	wait(2)
+	Lives = Starting_Lives
+	Score = 0
+	local Game_Frame_Children = Game_Frame:GetChildren()
+	for i = 1, #Game_Frame_Children do
+		if Game_Frame_Children[i].Name == "Active_Enemy" or Game_Frame_Children[i].Name == "Active_Bullet" then
+			Game_Frame_Children[i]:Destroy()
+		end
+	end
+	Input_Cooldown = false
+	Start_Text.Visible = true
+end
+-- // Game is over function
+
+local function Spawn_Enemy()
+	local Spawn_Increment = 1
+	if Score == 0 then
+		Spawn_Increment = 1
+	end
+	if Score >= 3 then
+		Spawn_Increment = 2
+	end
+	if Score >= 6 then
+		Spawn_Increment = 3
+	end
+	for i = 1, Spawn_Increment do
+		local Random_X = math.random(LeftMax*100, RightMax*100)/100
+		local New_Enemy = Enemy_Shuttle:Clone()
+		New_Enemy.Position = UDim2.new(Random_X, 0, Enemy_Y_Starting, 0)
+		New_Enemy.Parent = Game_Frame
+		New_Enemy.X_Value.Value = Random_X
+		New_Enemy.Y_Value.Value = Enemy_Y_Starting
+		New_Enemy.Visible = true
+		New_Enemy.Name = "Active_Enemy"
+	end
+end
+-- // Spawns Enemy
+
+User_Input_Service.InputBegan:Connect(function(Input)
+	if Input.KeyCode == Enum.KeyCode.Space then
+		if Game_InProgress == false then
+			if Input_Cooldown == false then
+				Input_Cooldown = true
+				Start_Game()
+				wait(Input_Cooldown_Wait)
+				Input_Cooldown = false
+			end
+		elseif Game_InProgress == true then
+			if Fire_Cooldown == false then
+				Fire_Cooldown = true
+				Fire()
+				wait(Fire_Cooldown_Time)
+				Fire_Cooldown = false
+			end
+		end
+	elseif Input.KeyCode == Enum.KeyCode.Left or Input.KeyCode == Enum.KeyCode.A then
+		if Game_InProgress == true then
+			Moving_Left = true
+		end
+	elseif Input.KeyCode == Enum.KeyCode.Right or Input.KeyCode == Enum.KeyCode.D then
+		if Game_InProgress == true then
+			Moving_Right = true
+		end
+	end
+end)
+-- // initialize game from user input
+
+User_Input_Service.InputEnded:Connect(function(Input)
+	if Input.KeyCode == Enum.KeyCode.Left or Input.KeyCode == Enum.KeyCode.A then
+		if Game_InProgress == true then
+			Moving_Left = false
+		end
+	elseif Input.KeyCode == Enum.KeyCode.Right or Input.KeyCode == Enum.KeyCode.D then
+		if Game_InProgress == true then
+			Moving_Right = false
+		end
+	end
+end)
+-- // user input ended
+
+Run_Service.Heartbeat:Connect(function()
+	if Game_InProgress == true then
+		if Movement_Wait >= Movement_Wait_Increment then
+			if Moving_Right == true then
+				if Current_X < RightMax then
+					Current_X = Current_X + Move_Increment
+					Player_Shuttle.Position = UDim2.new(Current_X, 0, Starting_Y, 0)
+				elseif Current_X > RightMax then
+					Player_Shuttle.Position = UDim2.new(RightMax, 0, Starting_Y, 0)
+				end
+			end
+			if Moving_Left == true then
+				if Current_X > LeftMax then
+					Current_X = Current_X - Move_Increment
+					Player_Shuttle.Position = UDim2.new(Current_X, 0, Starting_Y, 0)
+				elseif Current_X < LeftMax then
+					Player_Shuttle.Position = UDim2.new(LeftMax, 0, Starting_Y, 0)
+				end
+			end
+			Movement_Wait = 0
+		else
+			Movement_Wait = Movement_Wait + 1
+		end
+		-- // Player Shuttle Movement
+		
+		if Bullet_Move_Wait >= Bullet_Move_Wait_Time then
+			local Game_Frame_Children = Game_Frame:GetChildren()
+			for i = 1, #Game_Frame_Children do
+				if Game_Frame_Children[i].Name == "Active_Bullet" then
+					local Current_Bullet = Game_Frame_Children[i]
+					Current_Bullet.Y_Value.Value = tonumber(Current_Bullet.Y_Value.Value) - Bullet_Move_Increment
+					Current_Bullet.Position = UDim2.new(tonumber(Current_Bullet.X_Value.Value), 0, tonumber(Current_Bullet.Y_Value.Value), 0)
+					if tonumber(Current_Bullet.Y_Value.Value) <= 0 then
+						Current_Bullet:Destroy()
+					end
+				end
+			end
+			Bullet_Move_Wait = 0
+		else
+			Bullet_Move_Wait = Bullet_Move_Wait + 1
+		end
+		-- // Bullet movement and deletion upon Y axis limit reached
+		
+		if Enemy_Move_Wait >= Enemy_Move_Wait_Time then
+			local Game_Frame_Children = Game_Frame:GetChildren()
+			for i = 1, #Game_Frame_Children do
+				if Game_Frame_Children[i].Name == "Active_Enemy" then
+					local Current_Enemy = Game_Frame_Children[i]
+					Current_Enemy.Y_Value.Value = tonumber(Current_Enemy.Y_Value.Value) + Enemy_Move_Increment
+					Current_Enemy.Position = UDim2.new(tonumber(Current_Enemy.X_Value.Value), 0, tonumber(Current_Enemy.Y_Value.Value), 0)
+					if tonumber(Current_Enemy.Y_Value.Value) > .997 then
+						Lives = Lives - 1
+						Current_Enemy:Destroy()
+					end
+				end
+			end
+			Enemy_Move_Wait = 0
+		else
+			Enemy_Move_Wait = Enemy_Move_Wait + 1
+		end
+		-- // Enemy movement handling
+		
+		if Enemy_Spawn_Increment >= 80 then
+			Spawn_Enemy()
+			Enemy_Spawn_Increment = 0
+		else
+			Enemy_Spawn_Increment = Enemy_Spawn_Increment + 1
+		end
+		-- // Enemy Spawning
+		
+		local Game_Frame_Children = Game_Frame:GetChildren()
+		local Target_Positions = {}
+		for i = 1, #Game_Frame_Children do
+			if Game_Frame_Children[i].Name == "Active_Bullet" then
+				local Current_Bullet = Game_Frame_Children[i]
+				
+				local Target_X_Min = Game_Frame_Children[i].AbsolutePosition.X - 25
+				local Target_X_Max = Game_Frame_Children[i].AbsolutePosition.X + 25
+				local Target_Y_Min = Game_Frame_Children[i].AbsolutePosition.Y - 35
+				local Target_Y_Max = Game_Frame_Children[i].AbsolutePosition.Y + 35
+				
+				for i = 1, #Game_Frame_Children do
+					if Game_Frame_Children[i].Name == "Active_Enemy" then
+						if Game_Frame_Children[i].AbsolutePosition.X > Target_X_Min and Game_Frame_Children[i].AbsolutePosition.X < Target_X_Max and Game_Frame_Children[i].AbsolutePosition.Y > Target_Y_Min and Game_Frame_Children[i].AbsolutePosition.Y < Target_Y_Max then
+							Score = Score + 1
+							Game_Frame_Children[i]:Destroy()
+							Current_Bullet:Destroy()
+						end
+					end
+				end
+			end
+		end
+		-- // Bullet hit detection
+		
+		Score_Text.Text = ("Score: "..Score)
+		if Score > Best_Score then
+			Best_Score = Score
+			Best_Score_Text.Text = ("Best Score: "..Best_Score)
+		end
+		Lives_Text.Text = ("Lives: "..Lives)
+		-- // Updater
+		
+		local Cooldown = false
+		if Lives <= 0 then
+			if Cooldown == false then
+				Game_Over()
+				wait(1)
+				Cooldown = true
+			end
+		Lives_Text.Visible = false
+		end
+	end
+end)
+-- // render frame function (runs 40 times per second)
