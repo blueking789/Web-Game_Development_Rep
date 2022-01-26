@@ -1,0 +1,430 @@
+local Player_Service = game:GetService("Players");
+local User_Input_Service = game:GetService("UserInputService");
+local Run_Service = game:GetService("RunService");
+local Sound_Service = game:GetService("SoundService");
+--// Service Vars
+
+local Local_Player = Player_Service.LocalPlayer;
+local Player_Gui = Local_Player:WaitForChild("PlayerGui");
+--// Player Vars
+
+local Client_Audio = Sound_Service:WaitForChild("Client_Audio");
+local Die = Client_Audio:WaitForChild("Die");
+local High_Score = Client_Audio:WaitForChild("High_Score");
+local Jump = Client_Audio:WaitForChild("Jump");
+--// Audio Vars
+
+local Game_Screen_Gui = Player_Gui:WaitForChild("Game_Screen_Gui");
+local Screen_Size_Frame = Game_Screen_Gui:WaitForChild("Screen_Size_Frame");
+local Asset_Frame = Screen_Size_Frame:WaitForChild("Asset_Frame");
+local Dino_Image = Asset_Frame:WaitForChild("Dino_Image");
+local Best_Score_Text = Screen_Size_Frame:WaitForChild("Best_Score_Text");
+local Score_Text = Screen_Size_Frame:WaitForChild("Score_Text");
+local Cactus_1 = Asset_Frame:WaitForChild("Cactus_1");
+local Cactus_2 = Asset_Frame:WaitForChild("Cactus_2");
+local Cactus_3 = Asset_Frame:WaitForChild("Cactus_3");
+local Cactus_4 = Asset_Frame:WaitForChild("Cactus_4");
+local Cactus_5 = Asset_Frame:WaitForChild("Cactus_5");
+local Enemy_Cactus = {Cactus_1, Cactus_2, Cactus_3, Cactus_4, Cactus_5};
+local Bird = Asset_Frame:WaitForChild("Bird");
+local Ground = Asset_Frame:WaitForChild("Ground");
+local Cloud = Asset_Frame:WaitForChild("Cloud");
+local Game_Over_Text = Screen_Size_Frame:WaitForChild("Game_Over_Text");
+local Restart_Button = Screen_Size_Frame:WaitForChild("Restart_Button");
+--// UI Vars
+
+local Ground_Folder = Asset_Frame:WaitForChild("Ground_Folder");
+local Clouds_Folder = Asset_Frame:WaitForChild("Clouds_Folder");
+local Enemy_Folder = Asset_Frame:WaitForChild("Enemy_Folder");
+-- UI Folder Vars
+
+local Dino_Stances = {
+	"rbxassetid://8627000617",
+	"rbxassetid://8627001170",
+	"rbxassetid://8627001772",
+	"rbxassetid://8627002150"
+};
+--// Dino Stance ID's... Because animation is cool! :)
+
+local Game_In_Progress = false;
+
+local Jumping = false;
+local Jump_Inclining = false;
+local Jump_Declining = false;
+local Jump_Increment = .025;
+local Max_Y_Pos = .4; -- jump height
+
+local Run_Rate_Per_Second = 6;
+local Run_Animation_Increment_Count = 0;
+local Bird_Animation_Increment_Count = 0;
+
+local Ground_Move_Increment = .005;
+local Grounds_Spawned = 5;
+local Ground_Spawn_Increment = 3;
+
+local Cloud_Move_Increment = .001;
+local Clouds_Spawned = 7;
+local Cloud_Spawn_Increment = 3;
+
+local Score = 0;
+local Best_Score = 0;
+local Hit_Best_Score_On_Turn = false;
+local Score_Rate_Per_Second = 8;
+local Score_Increment_Count = 0;
+
+local Enemy_Move_Increment = .005;
+local Enemy_Spawned = 6;
+local Enemy_Spawn_Increment = 3;
+
+local Restart_Cooldown = false;
+--// Functionality Vars
+
+local function Setup_Game()
+	Run_Animation_Increment_Count = 0;
+	Jump_Declining = false;
+	Jump_Declining = false;
+	Jumping = false;
+	Ground_Spawn_Increment = 3;
+	Cloud_Spawn_Increment = 3;
+	Score = 0;
+	Hit_Best_Score_On_Turn = false;
+	Score_Increment_Count = 0;
+	Enemy_Spawn_Increment = 3;
+	
+	Dino_Image.Y_Pos.Value = .859;
+	Dino_Image.Position = UDim2.new(tonumber(Dino_Image.X_Pos.Value), 0, tonumber(Dino_Image.Y_Pos.Value), 0);
+	
+	local Clouds = Clouds_Folder:GetChildren();
+	for i = 1, #Clouds do
+		Clouds[i]:Destroy();
+	end;
+	
+	local Enemys = Enemy_Folder:GetChildren();
+	for i = 1, #Enemys do
+		Enemys[i]:Destroy();
+	end;
+	
+	local Grounds = Ground_Folder:GetChildren();
+	for i = 1, #Grounds do
+		Grounds[i]:Destroy();
+	end;
+	
+	Score_Text.Text = "00000";
+	
+	local C1 = Cloud:Clone();
+	C1.Parent = Clouds_Folder;
+	C1.Name = "1";
+	C1.Visible = true;
+	C1.X_Pos.Value = .168;
+	C1.Y_Pos.Value = .31;
+	C1.Position = UDim2.new(tonumber(C1.X_Pos.Value), 0, tonumber(C1.Y_Pos.Value), 0);
+	
+	local C2 = Cloud:Clone();
+	C2.Parent = Clouds_Folder;
+	C2.Name = "2";
+	C2.Visible = true;
+	C2.X_Pos.Value = .491;
+	C2.Y_Pos.Value = .161;
+	C2.Position = UDim2.new(tonumber(C2.X_Pos.Value), 0, tonumber(C2.Y_Pos.Value), 0);
+	
+	local C3 = Cloud:Clone();
+	C3.Parent = Clouds_Folder;
+	C3.Name = "3";
+	C3.Visible = true;
+	C3.X_Pos.Value = .813;
+	C3.Y_Pos.Value = .389;
+	C3.Position = UDim2.new(tonumber(C3.X_Pos.Value), 0, tonumber(C3.Y_Pos.Value), 0);
+	
+	local G1 = Ground:Clone();
+	G1.Parent = Ground_Folder;
+	G1.Name = "1";
+	G1.Visible = true;
+	G1.X_Pos.Value = .5;
+	G1.Y_Pos.Value = .974;
+	G1.Position = UDim2.new(tonumber(G1.X_Pos.Value), 0, tonumber(G1.Y_Pos.Value), 0);
+
+	local G2 = Ground:Clone();
+	G2.Parent = Ground_Folder;
+	G2.Name = "2";
+	G2.Visible = true;
+	G2.X_Pos.Value = 1.5;
+	G2.Y_Pos.Value = .974;
+	G2.Position = UDim2.new(tonumber(G2.X_Pos.Value), 0, tonumber(G2.Y_Pos.Value), 0);
+
+	local G3 = Ground:Clone();
+	G3.Parent = Ground_Folder;
+	G3.Name = "3";
+	G3.Visible = true;
+	G3.X_Pos.Value = 2.5;
+	G3.Y_Pos.Value = .974;
+	G3.Position = UDim2.new(tonumber(G3.X_Pos.Value), 0, tonumber(G3.Y_Pos.Value), 0);
+	
+	local CS1 = Enemy_Cactus[math.random(1, #Enemy_Cactus)]:Clone();
+	CS1.Parent = Enemy_Folder;
+	CS1.Name = "1";
+	CS1.Visible = true;
+	CS1.X_Pos.Value = 1.2;
+	CS1.Y_Pos.Value = .859;
+	CS1.Position = UDim2.new(tonumber(G3.X_Pos.Value), 0, tonumber(G3.Y_Pos.Value), 0);
+	
+	local CS2 = Enemy_Cactus[math.random(1, #Enemy_Cactus)]:Clone();
+	CS2.Parent = Enemy_Folder;
+	CS2.Name = "2";
+	CS2.Visible = true;
+	CS2.X_Pos.Value = 1.7;
+	CS2.Y_Pos.Value = .859;
+	CS2.Position = UDim2.new(tonumber(G3.X_Pos.Value), 0, tonumber(G3.Y_Pos.Value), 0);
+	
+	local CS3 = Enemy_Cactus[math.random(1, #Enemy_Cactus)]:Clone();
+	CS3.Parent = Enemy_Folder;
+	CS3.Name = "3";
+	CS3.Visible = true;
+	CS3.X_Pos.Value = 2.2;
+	CS3.Y_Pos.Value = .859;
+	CS3.Position = UDim2.new(tonumber(G3.X_Pos.Value), 0, tonumber(G3.Y_Pos.Value), 0);
+	
+	Dino_Image.Image = Dino_Stances[1];
+	
+	Game_Over_Text.Visible = false;
+	Restart_Button.Visible = false;
+	
+	Game_In_Progress = true;
+end;
+
+local function End_Game()
+	Game_In_Progress = false;
+	Dino_Image.Image = Dino_Stances[4];
+	Die:Play();
+	Game_Over_Text.Visible = true;
+	Restart_Button.Visible = true;
+end;
+
+local function High_Score_Effect()
+	for i = 1, 8 do
+		Best_Score_Text.Visible = not Best_Score_Text.Visible;
+		wait(.25)
+	end;
+	Best_Score_Text.Visible = true;
+end;
+
+local function Start_Game()
+	if Restart_Cooldown == false then
+		Restart_Cooldown = true;
+		Setup_Game();
+		wait(1);
+		Restart_Cooldown = false;
+	end;
+end;
+
+User_Input_Service.InputBegan:Connect(function(Input)
+	if Input.KeyCode == Enum.KeyCode.Space then
+		if Game_In_Progress == false then
+			Start_Game();
+		elseif Game_In_Progress == true then
+			if Jumping == false then
+				Jumping = true;
+				Jump_Inclining = true;
+				Jump:Play();
+			end;
+		end;
+	end;
+end);
+
+Restart_Button.MouseButton1Click:Connect(function()
+	if Game_In_Progress == false then
+		Start_Game();
+	end;
+end);
+
+Run_Service.RenderStepped:Connect(function(Step)
+	if Game_In_Progress == true then
+		local Increment = Step * Run_Rate_Per_Second
+		
+		if Jumping == true then --// DINO ANIMATION
+			Dino_Image.Image = Dino_Stances[1];
+		else
+			Run_Animation_Increment_Count = Run_Animation_Increment_Count + Increment;
+			if Run_Animation_Increment_Count >= 1 then
+				Run_Animation_Increment_Count = 0;
+				if Dino_Image.Image == Dino_Stances[2] then
+					Dino_Image.Image = Dino_Stances[3];
+				elseif Dino_Image.Image == Dino_Stances[3] then
+					Dino_Image.Image = Dino_Stances[2];
+				else
+					Dino_Image.Image = Dino_Stances[3];
+				end;
+			end;
+		end;
+		
+		Bird_Animation_Increment_Count = Bird_Animation_Increment_Count + Increment; -- BIRD ANIMATION
+		if Bird_Animation_Increment_Count >= 1 then
+			Bird_Animation_Increment_Count = 0;
+			local Enemies = Enemy_Folder:GetChildren();
+			for i = 1, #Enemies do
+				if Enemies[i].IsBird.Value == true then
+					if Enemies[i].Image == "rbxassetid://8642072408" then
+						Enemies[i].Image = "rbxassetid://8642072721";
+					elseif Enemies[i].Image == "rbxassetid://8642072721" then
+						Enemies[i].Image = "rbxassetid://8642072408";
+					end;
+				end;
+			end;
+		end;
+		
+		
+		if Jumping == true then --// JUMPING
+			if Jump_Inclining == true then
+				Dino_Image.Y_Pos.Value = Dino_Image.Y_Pos.Value - Jump_Increment;
+				Dino_Image.Position = UDim2.new(tonumber(Dino_Image.X_Pos.Value), 0, tonumber(Dino_Image.Y_Pos.Value), 0);
+				if tonumber(Dino_Image.Y_Pos.Value) <= Max_Y_Pos then
+					Dino_Image.Y_Pos.Value = Max_Y_Pos;
+					Dino_Image.Position = UDim2.new(tonumber(Dino_Image.X_Pos.Value), 0, tonumber(Dino_Image.Y_Pos.Value), 0);
+					Jump_Inclining = false;
+					Jump_Declining = true;
+				end
+			elseif Jump_Declining == true then
+				Dino_Image.Y_Pos.Value = tonumber(Dino_Image.Y_Pos.Value) + Jump_Increment;
+				Dino_Image.Position = UDim2.new(tonumber(Dino_Image.X_Pos.Value), 0, tonumber(Dino_Image.Y_Pos.Value), 0);
+				if tonumber(Dino_Image.Y_Pos.Value) >= tonumber(Dino_Image.Default_Y_Position.Value) then
+					Dino_Image.Y_Pos.Value = tonumber(Dino_Image.Default_Y_Position.Value);
+					Dino_Image.Position = UDim2.new(tonumber(Dino_Image.X_Pos.Value), 0, tonumber(Dino_Image.Y_Pos.Value), 0);
+					Jumping = false;
+					Jump_Declining = false;
+				end;
+			end;
+		end;
+		
+		local Grounds = Ground_Folder:GetChildren(); --// MOVE / CHECK GROUND FOR DESTROY
+		for i = 1, #Grounds do
+			Grounds[i].X_Pos.Value = tonumber(Grounds[i].X_Pos.Value) - Ground_Move_Increment - Score/100000;
+			Grounds[i].Position = UDim2.new(tonumber(Grounds[i].X_Pos.Value), 0, tonumber(Grounds[i].Y_Pos.Value), 0);
+			if tonumber(Grounds[i].X_Pos.Value) <= -2 then
+				Grounds[i]:Destroy();
+			end;
+		end;
+		
+		local Grounds_Count = Ground_Folder:GetChildren(); --// SPAWN NEW GROUND
+		if #Grounds_Count < Grounds_Spawned then
+			local New_Ground = Ground_Folder[tostring(Ground_Spawn_Increment)]:Clone();
+			New_Ground.X_Pos.Value = tonumber(Ground_Folder[tostring(Ground_Spawn_Increment)].X_Pos.Value) + 1;
+			New_Ground.Position = UDim2.new(tonumber(New_Ground.X_Pos.Value), 0, tonumber(New_Ground.Y_Pos.Value), 0);
+			New_Ground.Name = Ground_Spawn_Increment + 1;
+			New_Ground.Parent = Ground_Folder;
+			Ground_Spawn_Increment = Ground_Spawn_Increment + 1;
+		end;
+		
+		local Clouds = Clouds_Folder:GetChildren(); -- MOVE CLOUDS
+		for i = 1, #Clouds do
+			Clouds[i].X_Pos.Value = tonumber(Clouds[i].X_Pos.Value) - Cloud_Move_Increment;
+			Clouds[i].Position = UDim2.new(tonumber(Clouds[i].X_Pos.Value), 0, tonumber(Clouds[i].Y_Pos.Value), 0);
+			if tonumber(Clouds[i].X_Pos.Value) <= -1 then
+				Clouds[i]:Destroy();
+			end;
+		end;
+		
+		local Clouds_Count = Clouds_Folder:GetChildren(); --// SPAWN NEW CLOUDS
+		if #Clouds_Count < Clouds_Spawned then
+			local New_Cloud = Clouds_Folder[tostring(Cloud_Spawn_Increment)]:Clone();
+			New_Cloud.X_Pos.Value = tonumber(Clouds_Folder[tostring(Cloud_Spawn_Increment)].X_Pos.Value) + math.random(38, 42)/100; -- .42, .38
+			New_Cloud.Y_Pos.Value = math.random(350, 367)/1000;
+			New_Cloud.Position = UDim2.new(tonumber(New_Cloud.X_Pos.Value), 0, tonumber(New_Cloud.Y_Pos.Value), 0);
+			New_Cloud.Name = Cloud_Spawn_Increment + 1;
+			New_Cloud.Parent = Clouds_Folder;
+			Cloud_Spawn_Increment = Cloud_Spawn_Increment + 1;
+		end;
+	
+		local Enemy = Enemy_Folder:GetChildren(); -- MOVE CACTUS / BIRDS
+		for i = 1, #Enemy do
+			Enemy[i].X_Pos.Value = tonumber(Enemy[i].X_Pos.Value) - Enemy_Move_Increment - Score/100000;
+			Enemy[i].Position = UDim2.new(tonumber(Enemy[i].X_Pos.Value), 0, tonumber(Enemy[i].Y_Pos.Value), 0);
+			if tonumber(Enemy[i].X_Pos.Value) <= -1 then
+				Enemy[i]:Destroy();
+			end;
+		end;
+
+		local Enemy_Count = Enemy_Folder:GetChildren(); -- SPAWN IN CACTUS / BIRDS
+		if #Enemy_Count < Enemy_Spawned then
+			
+			local New_Enemy
+			local New_Enemy_Bird = false;
+			
+			if Score < 70 then
+				New_Enemy = Enemy_Cactus[math.random(1, #Enemy_Cactus)]:Clone();
+			else
+				local Random_Num = math.random(1, 10);
+				if Random_Num == 5 then
+					New_Enemy = Bird:Clone();
+					New_Enemy_Bird = true;
+				else
+					New_Enemy = Enemy_Cactus[math.random(1, #Enemy_Cactus)]:Clone();
+				end;
+			end;
+			
+			
+			New_Enemy.X_Pos.Value = tonumber(Enemy_Folder[tostring(Enemy_Spawn_Increment)].X_Pos.Value) + math.random(2, 4)/10 + Score/1000;
+			
+			if New_Enemy_Bird == true then
+				local Random_Number = math.random(1, 2);
+				if Random_Number == 1 then
+					New_Enemy.Y_Pos.Value = .59;
+				else
+					New_Enemy.Y_Pos.Value = .846;
+				end;
+			else
+				New_Enemy.Y_Pos.Value = .876;
+			end;
+			
+			New_Enemy.Position = UDim2.new(tonumber(New_Enemy.X_Pos.Value), 0, tonumber(New_Enemy.Y_Pos.Value), 0);
+			
+			New_Enemy.Name = Enemy_Spawn_Increment + 1;
+			New_Enemy.Visible = true;
+			New_Enemy.Parent = Enemy_Folder;
+			Enemy_Spawn_Increment = Enemy_Spawn_Increment + 1;
+		end;
+		
+		local Enemies = Enemy_Folder:GetChildren(); -- DETECT HITS
+		for i = 1, #Enemies do
+			if tonumber(Dino_Image.X_Pos.Value) >= tonumber(Enemies[i].X_Pos.Value) - .04 and tonumber(Dino_Image.X_Pos.Value) <= tonumber(Enemies[i].X_Pos.Value) + .04 and tonumber(Dino_Image.Y_Pos.Value) >= tonumber(Enemies[i].Y_Pos.Value) - .045 and tonumber(Dino_Image.Y_Pos.Value) <= tonumber(Enemies[i].Y_Pos.Value) + .045 then
+				End_Game();
+			end;
+		end;
+		
+		Score_Increment_Count = Score_Increment_Count + Increment; -- UPDATE SCORE
+		if Score_Increment_Count >= 1 then
+			Score_Increment_Count = 0;
+			Score = Score + 1;
+			if Score > Best_Score and Hit_Best_Score_On_Turn == false then
+				Hit_Best_Score_On_Turn = true;
+				High_Score:Play();
+				High_Score_Effect();
+			end;
+			if Hit_Best_Score_On_Turn == true then
+				Best_Score = Score;
+			end;
+			if #tostring(Score) == 1 then
+				Score_Text.Text = "0000"..Score;
+			elseif #tostring(Score) == 2 then
+				Score_Text.Text = "000"..Score;
+			elseif #tostring(Score) == 3 then
+				Score_Text.Text = "00"..Score;
+			elseif #tostring(Score) == 4 then
+				Score_Text.Text = "0"..Score;
+			else
+				Score_Text.Text = Score;
+			end;
+			if Hit_Best_Score_On_Turn == true then
+				if #tostring(Score) == 1 then
+					Best_Score_Text.Text = "HI 0000"..Score;
+				elseif #tostring(Score) == 2 then
+					Best_Score_Text.Text = "HI 000"..Score;
+				elseif #tostring(Score) == 3 then
+					Best_Score_Text.Text = "HI 00"..Score;
+				elseif #tostring(Score) == 4 then
+					Best_Score_Text.Text = "HI 0"..Score;
+				else
+					Best_Score_Text.Text = "HI "..Score;
+				end;
+			end;
+		end;
+	end;
+end);
