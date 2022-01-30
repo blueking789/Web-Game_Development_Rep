@@ -1,0 +1,132 @@
+local Workspace_Service = game:GetService("Workspace");
+local Run_Service = game:GetService("RunService");
+--// Services
+
+local Vehicle_AI_Settings = require(script.Parent:WaitForChild("Vehicle_AI_Settings"));
+--// Settings Module
+
+local Route_Parts_Folder = Workspace_Service:WaitForChild("Route_Parts_Folder");
+--// Workspace Vars
+
+local Route_Dictionary = {};
+--// Routing Dictionary
+
+local Vehicle  = script.Parent;
+local Vehicle_Root_Part = Vehicle:WaitForChild("Vehicle_Root_Part");
+--// Misc Vars
+
+local Target_Route_Part = nil; -- Target route part, instance (part)
+local Current_Route_Folder = nil;
+
+local Vehicle_Lerp_Increment = 0; -- Lerping increment count
+--// Functionality Vars
+
+--------------------------------------------------------------------------------------------------------
+
+local Has_Setup_Route_Dictionary = false;
+local Setting_Up_Route_Dictionary = false;
+
+local function Setup_Route_Dictionary()
+	Setting_Up_Route_Dictionary = true;
+	
+	local Route_Folders = Route_Parts_Folder:GetChildren();
+	for i = 1, #Route_Folders do
+		
+		local Route_Folder_Routes = Route_Folders[i]:GetChildren();
+		
+		local Route_Table = {};
+		
+		for i = 1, #Route_Folder_Routes do
+			Route_Table[Route_Folder_Routes[i].Name] = Route_Folder_Routes[i];
+		end;
+		
+		Route_Dictionary[Route_Folders[i].Name] = Route_Table;
+	end;
+	
+	Has_Setup_Route_Dictionary = true;
+	Setting_Up_Route_Dictionary = false;
+end;
+
+---------------------------------------------
+
+local Finding_Closest_Route_Part = false;
+
+local function Find_Closest_Route_Part() -- FIND CLOSEST ROUTE PART
+	Finding_Closest_Route_Part = true;
+	
+	local Closest = nil;
+	local Closest_Folder = nil;
+	local Closest_Distance = nil;
+	
+	local Route_Folders = Route_Parts_Folder:GetChildren();
+	for i = 1, #Route_Folders do
+		local Route_Parts = Route_Folders[i]:GetChildren();
+		for ii = 1, #Route_Parts do
+			if Closest == nil then
+				Closest = Route_Parts[ii];
+				Closest_Folder = Route_Folders[i];
+
+				local Distance = (Route_Parts[ii].Position - Vehicle_Root_Part.Position).Magnitude;
+
+				Closest_Distance = Distance;
+			else
+				local Distance = (Route_Parts[ii].Position - Vehicle_Root_Part.Position).Magnitude;
+
+				if Distance < Closest_Distance then
+					Closest = Route_Parts[ii];
+					Closest_Folder = Route_Folders[i];
+					Closest_Distance = Distance;
+				end;
+			end;
+		end;
+	end;
+	return Closest, Closest_Folder;
+end;
+
+---------------------------------------------
+
+local function Lerp_Vehicle() -- MOVE VEHICLE
+	Vehicle_Lerp_Increment = Vehicle_Lerp_Increment + Vehicle_AI_Settings.Incremental_Speed;
+	Vehicle_Root_Part.CFrame = Vehicle_Root_Part.CFrame:Lerp(Target_Route_Part.CFrame, Vehicle_Lerp_Increment) -- move vehicle
+end;
+
+---------------------------------------------
+
+local function Check_Hit_Target_CFrame() -- CHECK VEHICLE HIT TARGET CFRAME
+	if Vehicle_Root_Part.CFrame == Target_Route_Part.CFrame then
+		return true;
+	else
+		return false;
+	end;
+end;
+
+---------------------------------------------
+
+local function Find_Next_Target_Route_Part()
+	return Route_Dictionary[Current_Route_Folder.Name][tostring(tonumber(Target_Route_Part.Name) + 1)];
+end;
+
+---------------------------------------------
+
+Run_Service.Stepped:Connect(function(B)
+	
+	if Has_Setup_Route_Dictionary == false then
+		if Setting_Up_Route_Dictionary == false then
+			Setup_Route_Dictionary();
+		end;
+	else
+		if Target_Route_Part == nil then
+			if Finding_Closest_Route_Part == false then
+				Target_Route_Part, Current_Route_Folder = Find_Closest_Route_Part();
+				Finding_Closest_Route_Part = false;
+			end;
+		else
+			Lerp_Vehicle(); -- move vehicle
+			
+			if Check_Hit_Target_CFrame() == true then -- check vehicle target
+				Vehicle_Lerp_Increment = Vehicle_AI_Settings.Incremental_Speed;
+				Target_Route_Part = Find_Next_Target_Route_Part(); -- find new vehicle target
+			end;
+		end;
+	end;	
+end);
